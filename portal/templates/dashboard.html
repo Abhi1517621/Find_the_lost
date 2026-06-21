@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Find The Lost - Dashboard</title>
+    <style>
+        .chat-msg { max-width: 80%; border-radius: 15px; padding: 8px 12px; margin-bottom: 5px; clear: both; }
+        .msg-me { background-color: #0d6efd; color: white; float: right; border-bottom-right-radius: 2px; }
+        .msg-other { background-color: #e9ecef; color: black; float: left; border-bottom-left-radius: 2px; }
+        .chat-time { font-size: 0.7rem; color: #6c757d; clear: both; margin-bottom: 10px; }
+        .time-me { text-align: right; }
+        .time-other { text-align: left; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">Find The Lost 🔍</h2>
+        <div>
+            <a href="{% url 'report' 'lost' %}" class="btn btn-danger me-2">I Lost Something</a>
+            <a href="{% url 'report' 'found' %}" class="btn btn-success me-3">I Found Something</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-dark">Logout</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0 mb-4">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                    <h5 class="mb-0">Student Profile</h5>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#profileModal">Edit</button>
+                </div>
+                {% if profile %}
+                    <p class="mb-1"><strong>Name:</strong> {{ profile.full_name }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ request.user.email }}</p>
+                    <p class="mb-1"><strong>Contact:</strong> {{ profile.contact_number }}</p>
+                    <p class="mb-1"><strong>Hostel:</strong> {{ profile.hostel }}</p>
+                    <p class="mb-1"><strong>Branch:</strong> {{ profile.branch }}</p>
+                    <p class="mb-1"><strong>Degree:</strong> {{ profile.degree }}</p>
+                    <p class="mb-1"><strong>Year:</strong> {{ profile.year_of_study }}</p>
+                {% else %}
+                    <div class="alert alert-warning p-2 text-center" role="alert">
+                        <small>Profile not set up yet.</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card p-4 mb-4 shadow-sm border-0">
+                <h5 class="text-primary mb-3">AI Match Search (Powered by RapidFuzz)</h5>
+                <input type="text" id="search-box" class="form-control form-control-lg" placeholder="Search for an item (e.g., 'Aple Macbok sylver')">
+                <div id="search-results" class="row mt-3"></div>
+            </div>
+
+            <h4 class="text-danger mt-4 border-bottom pb-2">Recently Lost Items</h4>
+            <div class="row mb-4">
+                {% for item in lost_items %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0 border-top border-danger border-3">
+                        {% if item.image %}<img src="{{ item.image.url }}" class="card-img-top" style="height:150px; object-fit:cover;">{% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title fw-bold">{{ item.title }}</h6>
+                            <p class="card-text text-muted small mb-2 flex-grow-1">{{ item.description|truncatechars:60 }}</p>
+                            <small class="text-muted d-block mb-3">{{ item.created_at|date:"M d, H:i" }}</small>
+                            
+                            <!-- Privacy/Ownership Check for Buttons -->
+                            {% if request.user == item.owner %}
+                                <button class="btn btn-primary btn-sm w-100" onclick="openInquiries({{ item.id }}, '{{ item.title|escapejs }}')">View Inquiries (Your Log)</button>
+                            {% else %}
+                                <button class="btn btn-outline-danger btn-sm w-100" onclick="openChat({{ item.id }}, '{{ item.title|escapejs }}')">Message Loser</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted ms-3">No lost items reported currently.</p>
+                {% endfor %}
+            </div>
+
+            <h4 class="text-success mt-4 border-bottom pb-2">Recently Found Items</h4>
+            <div class="row">
+                {% for item in found_items %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0 border-top border-success border-3">
+                        {% if item.image %}<img src="{{ item.image.url }}" class="card-img-top" style="height:150px; object-fit:cover;">{% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title fw-bold">{{ item.title }}</h6>
+                            <p class="card-text text-muted small mb-2 flex-grow-1">{{ item.description|truncatechars:60 }}</p>
+                            <small class="text-muted d-block mb-3">{{ item.created_at|date:"M d, H:i" }}</small>
+                            
+                            <!-- Privacy/Ownership Check for Buttons -->
+                            {% if request.user == item.owner %}
+                                <button class="btn btn-primary btn-sm w-100" onclick="openInquiries({{ item.id }}, '{{ item.title|escapejs }}')">View Inquiries (Your Log)</button>
+                            {% else %}
+                                <button class="btn btn-outline-success btn-sm w-100" onclick="openChat({{ item.id }}, '{{ item.title|escapejs }}')">Message Finder</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted ms-3">No found items reported currently.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Student Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'dashboard' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile">
+                    <div class="mb-2"><label>Full Name</label><input type="text" name="full_name" class="form-control" value="{{ profile.full_name|default:'' }}" required></div>
+                    <div class="mb-2"><label>Contact Number</label><input type="text" name="contact_number" class="form-control" value="{{ profile.contact_number|default:'' }}" required></div>
+                    <div class="mb-2"><label>Hostel</label><input type="text" name="hostel" class="form-control" value="{{ profile.hostel|default:'' }}" required></div>
+                    <div class="mb-2"><label>Branch</label><input type="text" name="branch" class="form-control" value="{{ profile.branch|default:'' }}" required></div>
+                    <div class="mb-2"><label>Degree</label><input type="text" name="degree" class="form-control" value="{{ profile.degree|default:'' }}" required></div>
+                    <div class="mb-3"><label>Year of Study</label><input type="number" name="year_of_study" class="form-control" value="{{ profile.year_of_study|default:'1' }}" required></div>
+                    <button type="submit" class="btn btn-primary w-100">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="inquiriesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inquiriesTitle">Messages about your item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="inquiriesList">
+                <!-- Inquirers loaded here via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="chatModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="chatTitle">Private Chat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light" id="chatWindow" style="height: 350px; overflow-y: auto;">
+                <!-- Chat messages loaded here via AJAX -->
+            </div>
+            <div class="modal-footer bg-white">
+                <div class="input-group w-100">
+                    <input type="text" id="chatInput" class="form-control" placeholder="Type your message securely...">
+                    <button class="btn btn-primary" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    const currentUsername = '{{ request.user.username }}';
+    
+    let activeItemId = null;
+    let activeTargetUserId = null; 
+    let chatPollInterval = null;
+
+    document.getElementById('search-box').addEventListener('input', async (e) => {
+        let query = e.target.value;
+        let container = document.getElementById('search-results');
+        
+        if (query.length < 2) { container.innerHTML = ''; return; }
+        
+        let response = await fetch(`/api/search/?query=${encodeURIComponent(query)}`);
+        let data = await response.json();
+        
+        container.innerHTML = '';
+        data.matches.forEach(item => {
+            let color = item.score > 75 ? 'success' : 'warning';
+            container.innerHTML += `
+                <div class="col-md-4 mb-2">
+                    <div class="card p-3 shadow-sm border-${color}">
+                        <h6 class="mb-1">${item.title}</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-${color}">${item.score}% Match</span>
+                            <small class="text-uppercase text-muted">${item.type}</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-dark" onclick="openChat(${item.id}, '${item.title}')">Inquire</button>
+                    </div>
+                </div>`;
+        });
+    });
+
+    async function openInquiries(itemId, title) {
+        document.getElementById('inquiriesTitle').innerText = `Inquiries: ${title}`;
+        let listContainer = document.getElementById('inquiriesList');
+        listContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+        
+        new bootstrap.Modal(document.getElementById('inquiriesModal')).show();
+        
+        let response = await fetch(`/api/chat/inquiries/${itemId}/`);
+        let data = await response.json();
+        
+        listContainer.innerHTML = '';
+        if (data.inquirers.length === 0) {
+            listContainer.innerHTML = '<p class="text-muted text-center">No one has messaged you about this yet.</p>';
+            return;
+        }
+
+        data.inquirers.forEach(user => {
+            listContainer.innerHTML += `
+                <div class="card mb-2 border-0 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">${user.username}</h6>
+                            <small class="text-muted">${user.last_message} (${user.time})</small>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openChat(${itemId}, '${title}', ${user.id})">Reply</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function openChat(itemId, title, targetUserId = null) {
+        activeItemId = itemId;
+        activeTargetUserId = targetUserId;
+        
+        let inquiriesModalEl = document.getElementById('inquiriesModal');
+        let inquiriesModal = bootstrap.Modal.getInstance(inquiriesModalEl);
+        if(inquiriesModal) { inquiriesModal.hide(); }
+
+        document.getElementById('chatTitle').innerText = `Chat: ${title}`;
+        document.getElementById('chatWindow').innerHTML = '';
+        
+        new bootstrap.Modal(document.getElementById('chatModal')).show();
+        
+        loadMessages();
+        
+        if (chatPollInterval) clearInterval(chatPollInterval);
+        chatPollInterval = setInterval(loadMessages, 3000);
+    }
+
+    document.getElementById('chatModal').addEventListener('hidden.bs.modal', function () {
+        if (chatPollInterval) clearInterval(chatPollInterval);
+        activeItemId = null;
+        activeTargetUserId = null;
+    });
+
+    async function loadMessages() {
+        if(!activeItemId) return;
+        
+        let url = activeTargetUserId ? `/api/chat/get/${activeItemId}/${activeTargetUserId}/` : `/api/chat/get/${activeItemId}/`;
+        
+        let response = await fetch(url);
+        let data = await response.json();
+        let win = document.getElementById('chatWindow');
+        
+        let isScrolledToBottom = win.scrollHeight - win.clientHeight <= win.scrollTop + 10;
+        win.innerHTML = '';
+        
+        data.messages.forEach(m => {
+            let isMe = m.sender === currentUsername;
+            let msgClass = isMe ? 'msg-me' : 'msg-other';
+            let timeClass = isMe ? 'time-me' : 'time-other';
+            
+            win.innerHTML += `
+                <div class="chat-msg ${msgClass}">${m.content}</div>
+                <div class="chat-time ${timeClass}">${m.sender} • ${m.time}</div>
+            `;
+        });
+        
+        if (isScrolledToBottom) {
+            win.scrollTop = win.scrollHeight;
+        }
+    }
+
+    async function sendMessage() {
+        let input = document.getElementById('chatInput');
+        let text = input.value.trim();
+        if(!text) return;
+        
+        let url = activeTargetUserId ? `/api/chat/send/${activeItemId}/${activeTargetUserId}/` : `/api/chat/send/${activeItemId}/`;
+        
+        input.value = ''; 
+        
+        await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify({content: text})
+        });
+        
+        loadMessages();
+        
+        setTimeout(() => {
+            let win = document.getElementById('chatWindow');
+            win.scrollTop = win.scrollHeight;
+        }, 100);
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    
+    document.getElementById('chatInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+</body>
+</html>
