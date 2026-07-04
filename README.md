@@ -41,7 +41,7 @@ The system relies on a unified User model tightly coupled to a `StudentProfile` 
 
 # 1. Clone the repository
 ```bash
-git clone [https://github.com/Abhi1517621/campus_recovery_portal.git](https://github.com/Abhi1517621/campus_recovery_portal.git)
+git clone https://github.com/Abhi1517621/campus_recovery_portal.git
 cd campus_recovery_portal
 ```
 # 2. Set up the virtual environment
