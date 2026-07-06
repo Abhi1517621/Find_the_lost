@@ -8,6 +8,12 @@ from rapidfuzz import process, fuzz
 from .models import Item, Message, StudentProfile
 from .forms import CampusRegistrationForm
 
+def landing_view(request):
+    """Renders the professional homepage. Redirects logged-in users to the dashboard."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'landing.html')
+
 def register_view(request):
     if request.method == 'POST':
         form = CampusRegistrationForm(request.POST)
