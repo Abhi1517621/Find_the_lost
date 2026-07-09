@@ -42,17 +42,17 @@ The system relies on a unified User model tightly coupled to a `StudentProfile` 
 ## How to Run Locally
 
 
-# 1. Clone the repository
+### 1. Clone the repository
 ```bash
 git clone https://github.com/Abhi1517621/campus_recovery_portal.git
 cd campus_recovery_portal
 ```
-# 2. Set up the virtual environment
+### 2. Set up the virtual environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```
-# 3. Install dependencies
+### 3. Install dependencies
 ```bash
 pip install django psycopg2-binary Pillow rapidfuzz
 ```
@@ -62,12 +62,12 @@ pip install django psycopg2-binary Pillow rapidfuzz
 # - Create a database named 'findthelost_db'
 # - Update the 'DATABASES' dictionary in 'core/settings.py' 
 ```
-# 5. Run database migrations
+### 5. Run database migrations
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
-# 6. Create the master administrator
+### 6. Create the master administrator
 ```bash
 python manage.py createsuperuser
 ```
