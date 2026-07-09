@@ -1,6 +1,6 @@
 # Find The Lost: Campus Recovery Portal
 
-###  **[Experience the Live Application Here](https://findthelost-production.up.railway.app/))**
+###  **[Experience the Live Application Here](https://findthelost-production.up.railway.app/)**
 
 A dynamic, full-stack web application designed to solve a localized logistics problem: the slow and inefficient process of recovering lost items on a university campus. This portal digitizes the traditional notice board, replacing it with an algorithmic matching system and secure peer-to-peer communication
 
