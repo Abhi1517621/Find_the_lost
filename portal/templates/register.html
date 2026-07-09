@@ -8,11 +8,11 @@
     <title>Register | IIT Indore</title>
     <style>
         body { 
-            /* Updated to .jpeg */
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('{% static "images/campus.jpeg" %}');
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('{% static "images/campus.jpg" %}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            background-color: #0f172a; 
             color: #f8fafc; 
             display: flex; 
             align-items: center; 
@@ -28,31 +28,27 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             animation: fadeInUp 0.6s ease-out;
         }
-        /* ADDED 'select' and '.form-control' to target Django's ChoiceFields */
-        .form-control, input[type="text"], input[type="password"], input[type="email"], select { 
+        /* UPDATED: Added input[type="number"] to target Year of study */
+        .form-control, input[type="text"], input[type="password"], input[type="email"], input[type="number"], select { 
             background: rgba(15, 23, 42, 0.8); 
             border: 1px solid #334155; 
             color: #f8fafc; 
             width: 100%; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            margin-bottom: 15px;
+        }
+        .form-control:focus, input:focus, select:focus { 
+            outline: none; 
+            border-color: #38bdf8; 
+            box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25); 
+            background: rgba(15, 23, 42, 0.9); 
+        }
         /* Ensure dropdown options are readable in dark mode */
         select option {
             background: #0f172a;
             color: #f8fafc;
         }
-        
-        /* Overriding browser autofill default styles */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
-        input:-webkit-autofill:active,
-        select:-webkit-autofill,
-        select:-webkit-autofill:hover,
-        select:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
-            -webkit-text-fill-color: #f8fafc !important;
-            caret-color: white;
-        }
-
         .btn-custom { background: #38bdf8; color: #0f172a; font-weight: 600; border: none; }
         .btn-custom:hover { background: #0284c7; color: white; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -73,7 +69,7 @@
                         <div class="text-start">
                             {{ form.as_p }}
                         </div>
-                        <button type="submit" class="btn btn-custom w-100 py-2 mt-3 mb-3 shadow-sm">Register via Secure Gateway</button>
+                        <button type="submit" class="btn btn-custom w-100 py-2 mt-3 mb-3 shadow-sm">Register</button>
                     </form>
                     <p class="text-center text-light small">Already registered? <a href="{% url 'login' %}" class="text-info text-decoration-none fw-bold">Login</a></p>
                 </div>
@@ -82,3 +78,4 @@
     </div>
 </body>
 </html>
+```eof
