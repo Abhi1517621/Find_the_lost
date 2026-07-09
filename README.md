@@ -56,7 +56,7 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```bash
 pip install django psycopg2-binary Pillow rapidfuzz
 ```
-# 4. Configure PostgreSQL
+### 4. Configure PostgreSQL
 ```bash
 # - Ensure PostgreSQL is installed and running locally
 # - Create a database named 'findthelost_db'
@@ -71,7 +71,7 @@ python manage.py migrate
 ```bash
 python manage.py createsuperuser
 ```
-# 7. Boot the server
+### 7. Boot the server
 ```bash
 python manage.py runserver
 ```
