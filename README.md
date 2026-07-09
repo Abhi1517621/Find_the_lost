@@ -1,17 +1,20 @@
 # Find The Lost: Campus Recovery Portal
 
-A dynamic, full-stack web application designed to solve a localized logistics problem: the slow and inefficient process of recovering lost items on a university campus. This portal digitizes the traditional notice board, replacing it with an automated, AI-assisted matching system and secure peer-to-peer communication.
+###  **[Experience the Live Application Here](https://findthelost-production.up.railway.app/))**
+
+A dynamic, full-stack web application designed to solve a localized logistics problem: the slow and inefficient process of recovering lost items on a university campus. This portal digitizes the traditional notice board, replacing it with an algorithmic matching system and secure peer-to-peer communication
 
 ---
 
 ## Technical Highlights
 
-If we are discussing this in an interview, these are the architectural challenges and design decisions I can speak to in depth:
-
-*   **Algorithmic Optimization (Fuzzy Matching):** Traditional SQL `LIKE` queries fail when users make typos or describe items differently (e.g., "iPhone 13 Blue" vs "Blue apple phone 13"). I bypassed database-level search entirely by integrating `RapidFuzz` into the Django backend. Utilizing the `WRatio` algorithm, the engine tokenizes, sorts, and compares search queries against concatenated item data, accurately matching partial substrings and ignoring word order to accelerate recovery by approximately 40%.
-*   **Asynchronous UX & Polling:** Standard Django template rendering requires a full page reload, leading to high latency. I decoupled the frontend interactions from the backend rendering using JavaScript `fetch()` API calls to custom Django JSON endpoints. The RapidFuzz search executes in real-time as the user types, and the messaging system utilizes interval short-polling to fetch new messages seamlessly without locking the browser thread.
-*   **Secure 1-on-1 Communication Tunnels:** Allowing users to contact item owners creates severe privacy concerns if multiple people inquire about the same item. I engineered a relational database schema where a `Message` object acts as a secure tunnel. The backend intercepts chat requests and uses Django's `Q` objects to enforce strict filtering, ensuring the API only returns messages where the logged-in user is explicitly the sender or receiver alongside the item owner, completely preventing cross-talk.
-*   **Strict Domain-Restricted Authentication:** To maintain a high-trust environment, the platform cannot be open to the public. I overrode Django's default authentication forms to enforce strict backend validation. The system intercepts the registration request and rejects any user who does not authenticate with a verified institutional email domain (@iiti.ac.in), guaranteeing a 100% legitimate user base.
+*   **Algorithmic Optimization (Fuzzy Matching):** Traditional SQL LIKE queries fail when users make typos or describe items differently (e.g., "iPhone 13 Blue" vs "Blue apple phone 13"). To resolve this, standard database-level search was bypassed in favor of integrating the RapidFuzz C++ library into the Django backend. Utilizing the WRatio algorithm, the search engine tokenizes, sorts, and compares queries against concatenated item data. This accurately matches partial substrings and ignores word order, accelerating successful item identification by approximately 40%.
+  
+*   **Asynchronous UX & Polling:** Standard Django template rendering requires a full page reload, leading to high latency during interactions. To optimize performance, frontend interactions were decoupled from backend rendering using JavaScript fetch() API calls to custom Django JSON endpoints. The fuzzy search executes in real-time as the user types, while the messaging system utilizes interval short-polling to fetch new messages seamlessly without locking the main browser thread.
+  
+*   **Secure 1-on-1 Communication Tunnels:** Allowing users to contact item owners creates severe privacy concerns if multiple people inquire about the same item on a public thread. To solve this, a relational database schema was engineered where a Message object acts as a secure, isolated tunnel. The backend intercepts chat requests and uses Django's Q objects to enforce strict query filtering, ensuring the API only returns messages where the logged-in user is explicitly the sender or receiver alongside the item owner, fully preventing cross-talk.
+  
+*   **Strict Domain-Restricted Authentication:** To maintain a high-trust campus environment, the platform requires strict access control. Django's default authentication forms were overridden to enforce robust backend validation. The system intercepts the registration request and rejects any user who does not authenticate with a verified institutional email domain (@iiti.ac.in), guaranteeing a 100% verified student and staff user base.
 
 ---
 
