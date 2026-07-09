@@ -203,9 +203,9 @@
                                 
                                 <!-- Dynamic Button Logic -->
                                 {% if request.user == item.owner %}
-                                    <button class="btn btn-outline-info btn-sm w-100 fw-bold" onclick="openInquiries({{ item.id }}, '{{ item.title|escapejs }}')">View Secure Log (Owner)</button>
+                                    <button class="btn btn-outline-info btn-sm w-100 fw-bold" onclick="openInquiries({{ item.id }}, '{{ item.title|escapejs }}')">View chat (Owner)</button>
                                 {% else %}
-                                    <button class="btn btn-outline-success btn-sm w-100 fw-bold" onclick="openChat({{ item.id }}, '{{ item.title|escapejs }}')">Initiate Secure Comms</button>
+                                    <button class="btn btn-outline-success btn-sm w-100 fw-bold" onclick="openChat({{ item.id }}, '{{ item.title|escapejs }}')">Initiate chat</button>
                                 {% endif %}
                             </div>
                         </div>
